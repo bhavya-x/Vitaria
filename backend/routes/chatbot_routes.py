@@ -11,8 +11,14 @@ chatbot_router = APIRouter()
 
 @chatbot_router.post("/")
 def chat_with_ai(query: ChatbotQuery):
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": query.text}]
-    )
-    return {"response": response["choices"][0]["message"]["content"]}
+    if not OPENAI_API_KEY:
+        return {"error": "OPENAI_API_KEY is not set."}
+    
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": query.text}]
+        )
+        return {"response": response["choices"][0]["message"]["content"]}
+    except Exception as e:
+        return {"error": str(e)}

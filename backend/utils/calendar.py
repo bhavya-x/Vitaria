@@ -1,18 +1,23 @@
-from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-import datetime
+from datetime import timedelta
 
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
-
-def create_calendar_event(summary, start_time, end_time):
-    credentials = service_account.Credentials.from_service_account_file("path_to_your_credentials.json", scopes=SCOPES)
-    service = build("calendar", "v3", credentials=credentials)
+def create_calendar_event(medicines, start_date, duration, user_id):
+    # Load credentials from a file or environment
+    creds = Credentials.from_authorized_user_file('path/to/credentials.json')
+    service = build('calendar', 'v3', credentials=creds)
 
     event = {
-        "summary": summary,
-        "start": {"dateTime": start_time, "timeZone": "UTC"},
-        "end": {"dateTime": end_time, "timeZone": "UTC"}
+        'summary': 'Medication Reminder',
+        'description': ', '.join(medicines),
+        'start': {
+            'dateTime': start_date.isoformat(),
+            'timeZone': 'America/Los_Angeles',  # Adjust as necessary
+        },
+        'end': {
+            'dateTime': (start_date + timedelta(days=duration)).isoformat(),
+            'timeZone': 'America/Los_Angeles',
+        },
     }
-    
-    event = service.events().insert(calendarId="primary", body=event).execute()
-    return event["id"]
+
+    service.events().insert(calendarId='primary', body=event).execute()
