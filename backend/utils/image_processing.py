@@ -1,6 +1,10 @@
 from PIL import Image
 import os
 
+#the image proessing is already included in chatbot(Rutuj)
+#As such no need of this file but still keeping it for reference
+#The below code is for image processing
+
 def resize_image(input_path, output_path, size):
     with Image.open(input_path) as img:
         img = img.resize(size)

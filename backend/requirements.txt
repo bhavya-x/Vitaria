@@ -10,3 +10,15 @@ google-auth-httplib2
 google-auth-oauthlib
 
 #MongoDB Cluster for Varaad,Rutuj
+#
+#Steps to Download the JSON File
+#Go to Google Developer Console: Visit the Google Developer Console.
+#Create a Project: If you haven't already, create a new project.
+#Enable Google Calendar API: In the API Library, search for "Google Calendar API" and enable it for your project.
+#Create Credentials:
+#Go to the "Credentials" tab.
+##Click on "Create Credentials" and select "OAuth client ID".
+#Configure the consent screen if prompted.
+#Choose "Desktop app" as the application type.
+#Click "Create" and then "Download" the JSON file.
+#
