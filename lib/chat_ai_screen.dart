@@ -10,7 +10,7 @@ class ChatAiScreen extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  const ChatAiScreen({super.key, required this.pageController, required this.selectedIndex});
+  ChatAiScreen({required this.pageController, required this.selectedIndex});
 
   @override
   _ChatAiScreenState createState() => _ChatAiScreenState();

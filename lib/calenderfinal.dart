@@ -8,7 +8,7 @@ class CalenderfinalWidget extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  const CalenderfinalWidget({super.key, required this.pageController, required this.selectedIndex});
+  CalenderfinalWidget({required this.pageController, required this.selectedIndex});
 
   @override
   _CalenderfinalWidgetState createState() => _CalenderfinalWidgetState();
@@ -18,7 +18,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final Map<DateTime, List<String>> _events = {};
+  Map<DateTime, List<String>> _events = {};
   bool _isLoading = false;
 
   @override
@@ -185,7 +185,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
   }
 
   void _showAddEventDialog(BuildContext context) {
-    final TextEditingController eventController = TextEditingController();
+    final TextEditingController _eventController = TextEditingController();
 
     showDialog(
       context: context,
@@ -193,7 +193,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
         return AlertDialog(
           title: Text('Add Event'),
           content: TextField(
-            controller: eventController,
+            controller: _eventController,
             decoration: InputDecoration(hintText: 'Enter event name'),
           ),
           actions: [
@@ -205,8 +205,8 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
             ),
             TextButton(
               onPressed: () {
-                if (eventController.text.isNotEmpty && _selectedDay != null) {
-                  _addEvent(_selectedDay!, eventController.text);
+                if (_eventController.text.isNotEmpty && _selectedDay != null) {
+                  _addEvent(_selectedDay!, _eventController.text);
                   Navigator.pop(context);
                 }
               },
