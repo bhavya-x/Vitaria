@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # vitaria
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# Vitaria
+PBL Project 
+>>>>>>> 6a347ee33e6245538d1543d4f31ddfb20734c6d6
