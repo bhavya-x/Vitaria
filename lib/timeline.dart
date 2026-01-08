@@ -5,7 +5,7 @@ class TimelineScreen extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  TimelineScreen({required this.pageController, required this.selectedIndex});
+  const TimelineScreen({super.key, required this.pageController, required this.selectedIndex});
 
   @override
   _TimelineScreenState createState() => _TimelineScreenState();
@@ -97,7 +97,7 @@ class TimelineEventCard extends StatelessWidget {
   final String title;
   final String description;
 
-  TimelineEventCard({
+  const TimelineEventCard({super.key, 
     required this.time,
     required this.title,
     required this.description,

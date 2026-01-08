@@ -5,7 +5,7 @@ class ChatBubble extends StatelessWidget {
   final String message;
   final bool isUser;
 
-  ChatBubble({required this.message, required this.isUser});
+  const ChatBubble({super.key, required this.message, required this.isUser});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class ChatBubble extends StatelessWidget {
 class ImageBubble extends StatelessWidget {
   final File image;
 
-  ImageBubble({required this.image});
+  const ImageBubble({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {
