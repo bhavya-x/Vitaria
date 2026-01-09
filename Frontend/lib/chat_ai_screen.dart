@@ -10,7 +10,7 @@ class ChatAiScreen extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  ChatAiScreen({required this.pageController, required this.selectedIndex});
+  const ChatAiScreen({super.key, required this.pageController, required this.selectedIndex});
 
   @override
   _ChatAiScreenState createState() => _ChatAiScreenState();
@@ -18,6 +18,7 @@ class ChatAiScreen extends StatefulWidget {
 
 class _ChatAiScreenState extends State<ChatAiScreen> {
   final TextEditingController _queryController = TextEditingController();
+  final ScrollController _scrollController = ScrollController(); // ✅ ScrollController
   final List<Map<String, dynamic>> _messages = [
     {"role": "user", "type": "text", "content": "I've been feeling dizzy lately. Any suggestions?"},
     {"role": "assistant", "type": "text", "content": "I see from your records that you have a history of low blood pressure. Have you been staying hydrated and monitoring your salt intake?"},
@@ -27,14 +28,27 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
   bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
 
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   Future<void> _sendQuery() async {
     if (_queryController.text.isEmpty) return;
 
     setState(() {
-      _isLoading = true;
       _messages.add({"role": "user", "type": "text", "content": _queryController.text});
       _queryController.clear();
     });
+
+    _scrollToBottom(); // ✅ Ensure scrolling happens after the frame builds
 
     try {
       final response = await http.post(
@@ -48,6 +62,8 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
         setState(() {
           _messages.add({"role": "assistant", "type": "text", "content": responseData['response']});
         });
+
+        _scrollToBottom(); // ✅ Ensure the new response is visible
       } else {
         throw Exception('Failed to load response');
       }
@@ -55,10 +71,7 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
       setState(() {
         _messages.add({"role": "assistant", "type": "text", "content": "Error: $error"});
       });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      _scrollToBottom();
     }
   }
 
@@ -68,6 +81,8 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
       setState(() {
         _messages.add({"role": "user", "type": "image", "content": File(image.path)});
       });
+
+      _scrollToBottom(); // ✅ Scroll after adding an image
     }
   }
 
@@ -100,6 +115,7 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController, // ✅ Attach ScrollController
               padding: EdgeInsets.all(16.0),
               itemCount: _messages.length,
               itemBuilder: (context, index) {

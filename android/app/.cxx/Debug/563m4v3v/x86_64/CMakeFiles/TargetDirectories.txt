@@ -1,0 +1,2 @@
+C:/Users/harsh/Desktop/vitaria/Frontend/android/app/.cxx/Debug/563m4v3v/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/harsh/Desktop/vitaria/Frontend/android/app/.cxx/Debug/563m4v3v/x86_64/CMakeFiles/rebuild_cache.dir

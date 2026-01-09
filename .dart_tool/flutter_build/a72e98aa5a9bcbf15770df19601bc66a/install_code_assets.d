@@ -1,0 +1,1 @@
+ C:\\Users\\harsh\\Desktop\\medismart\\vitaria\\.dart_tool\\flutter_build\\a72e98aa5a9bcbf15770df19601bc66a\\native_assets.json: 
