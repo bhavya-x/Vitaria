@@ -9,14 +9,14 @@ class ChatbotQuery(BaseModel):
     medical_records: dict  # Placeholder for medical records
 
     async def get_response(self):
-        # Fetch medical records if needed
+        # Prepare the request to your friend's chatbot
         records = self.medical_records
         
-        # Prepare the request to your friend's chatbot
+        # This function will now only return the chatbot's response without integrating with the database.
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "http://friend-chatbot/api/chat",
-                json={"text": self.text, "records": records}
+                json={"text": self.text}
             )
         
         return response.json()
