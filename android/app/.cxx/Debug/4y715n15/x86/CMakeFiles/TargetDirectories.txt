@@ -1,2 +1,0 @@
-C:/Users/harsh/Desktop/medismart/vitaria/android/app/.cxx/Debug/4y715n15/x86/CMakeFiles/edit_cache.dir
-C:/Users/harsh/Desktop/medismart/vitaria/android/app/.cxx/Debug/4y715n15/x86/CMakeFiles/rebuild_cache.dir

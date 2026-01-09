@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'loginpage.dart';
 import 'chat_ai_screen.dart';
 import 'calenderfinal.dart';
+import 'signuppage.dart';
 import 'timeline.dart';
 void main() {
   runApp(const MyApp());
