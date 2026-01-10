@@ -4,6 +4,11 @@ from routes.appointment_routes import appointment_router
 from routes.chatbot_routes import chatbot_router
 from routes.reports_routes import reports_router
 
+from app.routes.appointment_routes import appointment_router
+#error
+app.include_router(appointment_router)
+
+
 app = FastAPI(title="Smart Healthcare Assistant API")
 
 # Registering API routes
