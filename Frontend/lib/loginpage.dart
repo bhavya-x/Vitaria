@@ -58,7 +58,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
       // Login successful
       final responseData = json.decode(response.body);
       print('Login successful: $responseData');
-      // Navigate to the next screen
+      Navigator.pushReplacementNamed(context, '/chat');
     } else {
       // Login failed
       final errorData = json.decode(response.body);
@@ -91,7 +91,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
         // Google OAuth successful
         final responseData = json.decode(response.body);
         print('Google OAuth successful: $responseData');
-         Navigator.pushReplacementNamed(context, '/chat'); 
+        Navigator.pushReplacementNamed(context, '/chat');
       } else {
         // Google OAuth failed
         final errorData = json.decode(response.body);
@@ -114,7 +114,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Container(
@@ -126,25 +126,26 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                      'Assets/images/vitariaicon.png', // Replace with your image path
-                      width: 200.0,
-                      height: 200.0,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Text(
-                    'VITARIA',
-                    style: TextStyle(
-                      fontFamily: 'Noto Sans JP',
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  // Logo
                   Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.only(
+                        top: 20.0, left: 20.0, right: 20.0, bottom: 10.0), // Reduced bottom padding
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.asset(
+                        'Assets/images/vitariafinalicon.png',
+                        width: double.infinity,
+                        height: 150.0, // Adjusted height
+                        fit: BoxFit.contain,
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                  ),
+
+                  // Form Container
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 10.0, left: 20.0, right: 20.0, bottom: 20.0), // Reduced top padding
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -161,7 +162,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                       child: Form(
                         key: _formKey,
                         child: Padding(
-                          padding: const EdgeInsets.all(32.0),
+                          padding: const EdgeInsets.all(24.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             children: [
@@ -256,7 +257,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                               TextButton(
                                 onPressed: () {
                                   // Static navigation to signup page
-                                  print('Navigate to Signup');
+                                  Navigator.pushReplacementNamed(context, '/signup');
                                 },
                                 child: const Text(
                                   'Don\'t have an account? Sign up here',
