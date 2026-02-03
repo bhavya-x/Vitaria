@@ -10,7 +10,7 @@ class ChatAiScreen extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  ChatAiScreen({required this.pageController, required this.selectedIndex});
+  const ChatAiScreen({super.key, required this.pageController, required this.selectedIndex});
 
   @override
   _ChatAiScreenState createState() => _ChatAiScreenState();
@@ -24,6 +24,7 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
     {"role": "user", "type": "text", "content": "I think I have, but the dizziness persists."},
     {"role": "assistant", "type": "text", "content": "Since you're on medication for hypertension, dizziness could be a side effect. Have you noticed any other symptoms like nausea or weakness?"},
   ];
+  final PageController _pageController = PageController();
   bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
 
@@ -78,6 +79,7 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
         title: Text('AI Chatbot'),
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false, // Removes the back arrow
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Container(
@@ -88,10 +90,6 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.help_outline, color: Colors.black),
             onPressed: () {},
           ),
         ],
@@ -125,10 +123,12 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
             padding: EdgeInsets.all(16.0),
             child: Row(
               children: [
+                // Simple Plus Button (same style as Send)
                 IconButton(
-                  icon: Icon(Icons.add),
+                  icon: Icon(Icons.add,size: 40,),
                   onPressed: _pickImage,
                 ),
+                SizedBox(width: 8.0),
                 Expanded(
                   child: TextField(
                     controller: _queryController,
@@ -168,11 +168,13 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
           'Calendar',
         ],
         onTap: (index) {
-          widget.pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
+          if (widget.pageController.hasClients) {
+            widget.pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
         },
       ),
     );

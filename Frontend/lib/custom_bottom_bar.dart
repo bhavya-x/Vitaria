@@ -7,7 +7,7 @@ class CustomBottomBar extends StatelessWidget {
   final List<String> pageNames;
   final Function(int) onTap;
 
-  CustomBottomBar({
+  const CustomBottomBar({super.key, 
     required this.selectedIndex,
     required this.icons,
     required this.routes,

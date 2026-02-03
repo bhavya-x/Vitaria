@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:table_calendar/table_calendar.dart';
-import 'chatwidgets.dart'; 
-import 'custom_bottom_bar.dart';
+import 'package:intl/intl.dart'; // For date formatting
+import 'custom_bottom_bar.dart'; // Assuming this is your custom bottom bar file
+
 class CalenderfinalWidget extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  CalenderfinalWidget({required this.pageController, required this.selectedIndex});
+  const CalenderfinalWidget({
+    super.key,
+    required this.pageController,
+    required this.selectedIndex,
+  });
 
   @override
   _CalenderfinalWidgetState createState() => _CalenderfinalWidgetState();
@@ -18,7 +23,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<String>> _events = {};
+  final Map<DateTime, List<String>> _events = {};
   bool _isLoading = false;
 
   @override
@@ -35,7 +40,8 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
 
     try {
       final response = await http.get(
-        Uri.parse('https://your-fastapi-endpoint.com/events?date=${date.toIso8601String()}'),
+        Uri.parse(
+            'https://your-fastapi-endpoint.com/events?date=${date.toIso8601String()}'),
       );
 
       if (response.statusCode == 200) {
@@ -55,7 +61,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
     }
   }
 
-  Future<void> _addEvent(DateTime date, String event) async {
+  Future<void> _addEvent(DateTime date, String eventJson) async {
     setState(() {
       _isLoading = true;
     });
@@ -64,10 +70,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
       final response = await http.post(
         Uri.parse('https://your-fastapi-endpoint.com/events'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'date': date.toIso8601String(),
-          'event': event,
-        }),
+        body: eventJson, // JSON string directly passed
       );
 
       if (response.statusCode == 200) {
@@ -172,47 +175,163 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
           'Chat',
           'Calendar',
         ],
-       
         onTap: (index) {
-          widget.pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
+          if (widget.pageController.hasClients) {
+            widget.pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
         },
       ),
     );
   }
 
   void _showAddEventDialog(BuildContext context) {
-    final TextEditingController _eventController = TextEditingController();
+    final TextEditingController labelController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+    bool repeatWeekly = false; // Toggle for weekly repeat
+    String? errorMessage;
+
+    // Repeat days with toggle chips, visible only if repeatWeekly is true
+    final Map<String, bool> repeatDays = {
+      'Sun': false,
+      'Mon': false,
+      'Tue': false,
+      'Wed': false,
+      'Thu': false,
+      'Fri': false,
+      'Sat': false,
+    };
+    if (_selectedDay != null) {
+      final dayOfWeek = DateFormat('EEE').format(_selectedDay!); // Short day name (e.g., Mon)
+      repeatDays[dayOfWeek] = true; // Pre-select the current day
+    }
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('Add Event'),
-          content: TextField(
-            controller: _eventController,
-            decoration: InputDecoration(hintText: 'Enter event name'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (_eventController.text.isNotEmpty && _selectedDay != null) {
-                  _addEvent(_selectedDay!, _eventController.text);
-                  Navigator.pop(context);
-                }
-              },
-              child: Text('Add'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text('Add New Event'),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.85, // Limit dialog width
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Label Field with Validation
+                      TextField(
+                        controller: labelController,
+                        decoration: InputDecoration(
+                          labelText: 'Event Label *',
+                          hintText: 'e.g., Team Meeting',
+                          border: OutlineInputBorder(),
+                          errorText: errorMessage,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+
+                      // Description Field
+                      TextField(
+                        controller: descriptionController,
+                        decoration: InputDecoration(
+                          labelText: 'Description',
+                          hintText: 'e.g., Discuss project updates',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 2,
+                      ),
+                      SizedBox(height: 16.0),
+
+                      // Repeat Toggle Switch
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Repeat Weekly',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Switch(
+                            value: repeatWeekly,
+                            onChanged: (value) {
+                              setDialogState(() {
+                                repeatWeekly = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+
+                      // Show repeat days only if repeatWeekly is true
+                      if (repeatWeekly) ...[
+                        SizedBox(height: 8.0),
+                        Text(
+                          'Select Days:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8.0),
+                        Wrap(
+                          spacing: 6.0, // Reduced spacing to fit better
+                          runSpacing: 6.0, // Vertical spacing between rows
+                          children: repeatDays.keys.map((day) {
+                            return FilterChip(
+                              label: Text(day),
+                              selected: repeatDays[day]!,
+                              onSelected: (selected) {
+                                setDialogState(() {
+                                  repeatDays[day] = selected;
+                                });
+                              },
+                              padding: EdgeInsets.symmetric(horizontal: 8.0), // Compact chips
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (labelController.text.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = 'Please enter an event label';
+                      });
+                    } else if (repeatWeekly && !repeatDays.values.any((selected) => selected)) {
+                      setDialogState(() {
+                        errorMessage = 'Please select at least one day for repeat';
+                      });
+                    } else {
+                      final event = {
+                        'label': labelController.text,
+                        'description': descriptionController.text,
+                        'repeat_weekly': repeatWeekly,
+                        'repeat_days': repeatWeekly ? repeatDays : null, // Include days only if repeating
+                      };
+                      if (_selectedDay != null) {
+                        _addEvent(_selectedDay!, json.encode(event)); // Structured JSON
+                      }
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text('Add Event'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

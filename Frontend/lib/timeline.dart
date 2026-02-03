@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'chatwidgets.dart'; // Assuming this contains the CustomBottomBar
-import 'custom_bottom_bar.dart';
+import 'custom_bottom_bar.dart'; // Import the CustomBottomBar
+
 class TimelineScreen extends StatefulWidget {
   final PageController pageController;
   final int selectedIndex;
 
-  TimelineScreen({required this.pageController, required this.selectedIndex});
+  const TimelineScreen({
+    super.key,
+    required this.pageController,
+    required this.selectedIndex,
+  });
 
   @override
   _TimelineScreenState createState() => _TimelineScreenState();
@@ -79,13 +83,14 @@ class _TimelineScreenState extends State<TimelineScreen> {
           'Chat',
           'Calendar',
         ],
-       
         onTap: (index) {
-          widget.pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
+          if (widget.pageController.hasClients) {
+            widget.pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
         },
       ),
     );
@@ -97,7 +102,8 @@ class TimelineEventCard extends StatelessWidget {
   final String title;
   final String description;
 
-  TimelineEventCard({
+  const TimelineEventCard({
+    super.key,
     required this.time,
     required this.title,
     required this.description,
