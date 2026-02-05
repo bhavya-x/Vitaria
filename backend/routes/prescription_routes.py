@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from models.prescription import Prescription
 from database.connection import db
 

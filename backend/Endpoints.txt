@@ -1,0 +1,10 @@
+Endpoints:
+ 1.Root : GET 
+ 2.Prescriptions:   Post/prescriptions
+                    Get/Prescriptions
+ 3.Uploads:   Post/upload 
+              Get/records
+ 4.Reports:  Post/reports
+ 5.Appointments:  Post/Appointment
+                  Get/Appointment
+ 6.Chatbot:   Post/chatbot (prompt denge)

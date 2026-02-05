@@ -5,5 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URL")
-client = MongoClient(MONGO_URL)
-db = client["smart_healthcare"]
+if not MONGO_URL:
+    raise ValueError("MONGO_URL not found in .env file")
+try:
+    client = MongoClient(MONGO_URL)
+    client.server_info()  # Test connection
+    db = client["smart_healthcare"]
+except Exception as e:
+    raise ConnectionError(f"Failed to connect to MongoDB: {e}")
