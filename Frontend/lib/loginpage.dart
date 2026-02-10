@@ -40,7 +40,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('https://your-fastapi-endpoint.com/login');
+    final url = Uri.parse('https://vitaria.onrender.com/auth/login');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -94,6 +94,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
         Navigator.pushReplacementNamed(context, '/chat');
       } else {
         // Google OAuth failed
+
         final errorData = json.decode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Google OAuth failed: ${errorData['detail']}')),
@@ -133,7 +134,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.asset(
-                        'Assets/images/vitariafinalicon.png',
+                        'Assets/images/vitarialogo.png',
                         width: double.infinity,
                         height: 150.0, // Adjusted height
                         fit: BoxFit.contain,

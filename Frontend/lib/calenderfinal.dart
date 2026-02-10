@@ -23,7 +23,20 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final Map<DateTime, List<String>> _events = {};
+  final Map<DateTime, List<String>> _events = {
+    DateTime(2025, 3, 24): [
+      '8:00 AM - Take 1 tablet of Lisinopril 10mg',
+      '2:00 PM - Appointment with Dr. Smith (Cardiology)',
+    ],
+    DateTime(2025, 3, 25): [
+      '9:00 AM - Take 2 tablets of Metformin 500mg',
+      '6:00 PM - Take 1 capsule of Omeprazole 20mg',
+    ],
+    DateTime(2025, 3, 26): [
+      '10:00 AM - Follow-up with Dr. Jones (Endocrinology)',
+      '3:00 PM - Take 1 tablet of Atorvastatin 20mg',
+    ],
+  };
   bool _isLoading = false;
 
   @override
@@ -41,7 +54,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://your-fastapi-endpoint.com/events?date=${date.toIso8601String()}'),
+            'https://vitaria.onrender.com/appointments/?date=${date.toIso8601String()}'),
       );
 
       if (response.statusCode == 200) {
@@ -50,7 +63,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
           _events[date] = List<String>.from(responseData['events']);
         });
       } else {
-        throw Exception('Failed to load events');
+        print('Failed to load events from API, using static events');
       }
     } catch (error) {
       print('Error fetching events: $error');
@@ -68,13 +81,13 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://your-fastapi-endpoint.com/events'),
+        Uri.parse('https://vitaria.onrender.com/appointments/appointment'),
         headers: {'Content-Type': 'application/json'},
-        body: eventJson, // JSON string directly passed
+        body: eventJson,
       );
 
       if (response.statusCode == 200) {
-        await _fetchEventsForDate(date); // Refresh events for the selected date
+        await _fetchEventsForDate(date);
       } else {
         throw Exception('Failed to add event');
       }
@@ -123,7 +136,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                 _calendarFormat = format;
               });
             },
-            eventLoader: (day) => _events[day] ?? [],
+            eventLoader: (day) => [],
           ),
           Expanded(
             child: _isLoading
@@ -132,18 +145,32 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                     padding: EdgeInsets.all(16.0),
                     children: [
                       Text(
-                        'Schedule for ${_selectedDay != null ? _selectedDay!.toLocal().toString().split(' ')[0] : "selected date"}',
+                        'Schedule for ${_selectedDay != null ? DateFormat('yyyy-MM-dd').format(_selectedDay!) : "selected date"}',
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 16.0),
-                      if (_selectedDay != null && _events[_selectedDay] != null)
-                        ..._events[_selectedDay]!.map((event) => ListTile(
-                              title: Text(event),
+                      if (_selectedDay != null)
+                        ...(_events[DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day)] ?? []).map((event) => Card(
+                              elevation: 2.0,
+                              margin: EdgeInsets.symmetric(vertical: 8.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Text(
+                                  event,
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
                             )),
-                      if (_selectedDay != null && _events[_selectedDay] == null)
+                      if (_selectedDay != null && (_events[DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day)] ?? []).isEmpty)
                         Text('No events for this date.'),
                     ],
                   ),
@@ -191,10 +218,11 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
   void _showAddEventDialog(BuildContext context) {
     final TextEditingController labelController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
-    bool repeatWeekly = false; // Toggle for weekly repeat
+    final TextEditingController timeController = TextEditingController();
+    TimeOfDay? selectedTime;
+    bool repeatWeekly = false;
     String? errorMessage;
 
-    // Repeat days with toggle chips, visible only if repeatWeekly is true
     final Map<String, bool> repeatDays = {
       'Sun': false,
       'Mon': false,
@@ -205,8 +233,8 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
       'Sat': false,
     };
     if (_selectedDay != null) {
-      final dayOfWeek = DateFormat('EEE').format(_selectedDay!); // Short day name (e.g., Mon)
-      repeatDays[dayOfWeek] = true; // Pre-select the current day
+      final dayOfWeek = DateFormat('EEE').format(_selectedDay!);
+      repeatDays[dayOfWeek] = true;
     }
 
     showDialog(
@@ -218,7 +246,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
               title: Text('Add New Event'),
               content: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.85, // Limit dialog width
+                  maxWidth: MediaQuery.of(context).size.width * 0.85,
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -230,9 +258,36 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                         controller: labelController,
                         decoration: InputDecoration(
                           labelText: 'Event Label *',
-                          hintText: 'e.g., Team Meeting',
+                          hintText: 'e.g., Medication Dose',
                           border: OutlineInputBorder(),
                           errorText: errorMessage,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+
+                      // Time Field with Time Picker
+                      TextField(
+                        controller: timeController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Event Time *',
+                          hintText: 'Select time',
+                          border: OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.access_time),
+                            onPressed: () async {
+                              final TimeOfDay? picked = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (picked != null) {
+                                setDialogState(() {
+                                  selectedTime = picked;
+                                  timeController.text = picked.format(context);
+                                });
+                              }
+                            },
+                          ),
                         ),
                       ),
                       SizedBox(height: 16.0),
@@ -242,7 +297,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                         controller: descriptionController,
                         decoration: InputDecoration(
                           labelText: 'Description',
-                          hintText: 'e.g., Discuss project updates',
+                          hintText: 'e.g., Take with water',
                           border: OutlineInputBorder(),
                         ),
                         maxLines: 2,
@@ -277,8 +332,8 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                         ),
                         SizedBox(height: 8.0),
                         Wrap(
-                          spacing: 6.0, // Reduced spacing to fit better
-                          runSpacing: 6.0, // Vertical spacing between rows
+                          spacing: 6.0,
+                          runSpacing: 6.0,
                           children: repeatDays.keys.map((day) {
                             return FilterChip(
                               label: Text(day),
@@ -288,7 +343,7 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                                   repeatDays[day] = selected;
                                 });
                               },
-                              padding: EdgeInsets.symmetric(horizontal: 8.0), // Compact chips
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
                             );
                           }).toList(),
                         ),
@@ -310,19 +365,31 @@ class _CalenderfinalWidgetState extends State<CalenderfinalWidget> {
                       setDialogState(() {
                         errorMessage = 'Please enter an event label';
                       });
+                    } else if (selectedTime == null) {
+                      setDialogState(() {
+                        errorMessage = 'Please select an event time';
+                      });
                     } else if (repeatWeekly && !repeatDays.values.any((selected) => selected)) {
                       setDialogState(() {
                         errorMessage = 'Please select at least one day for repeat';
                       });
                     } else {
+                      final eventTime = selectedTime!.format(context);
                       final event = {
                         'label': labelController.text,
+                        'time': eventTime,
                         'description': descriptionController.text,
                         'repeat_weekly': repeatWeekly,
-                        'repeat_days': repeatWeekly ? repeatDays : null, // Include days only if repeating
+                        'repeat_days': repeatWeekly ? repeatDays : null,
                       };
                       if (_selectedDay != null) {
-                        _addEvent(_selectedDay!, json.encode(event)); // Structured JSON
+                        final eventString = '$eventTime - ${labelController.text}${descriptionController.text.isNotEmpty ? " (${descriptionController.text})" : ""}';
+                        setState(() {
+                          final dateKey = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
+                          _events[dateKey] = _events[dateKey] ?? [];
+                          _events[dateKey]!.add(eventString);
+                        });
+                        _addEvent(_selectedDay!, json.encode(event));
                       }
                       Navigator.pop(context);
                     }

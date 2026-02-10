@@ -18,24 +18,24 @@ class TimelineScreen extends StatefulWidget {
 class _TimelineScreenState extends State<TimelineScreen> {
   final List<Map<String, dynamic>> _timelineEvents = [
     {
-      'time': '10:00 AM',
-      'title': 'Team Meeting',
-      'description': 'Discuss project updates and deadlines.',
+      'time': '08:00 AM',
+      'title': 'Morning Medication',
+      'description': 'Take 1 tablet of Lisinopril 10mg for blood pressure.',
     },
     {
       'time': '12:00 PM',
-      'title': 'Lunch Break',
-      'description': 'Take a break and recharge.',
+      'title': 'Doctor Appointment',
+      'description': 'Check-up with Dr. Smith - Cardiology.',
     },
     {
-      'time': '02:00 PM',
-      'title': 'Client Call',
-      'description': 'Discuss requirements for the new project.',
+      'time': '03:00 PM',
+      'title': 'Afternoon Dose',
+      'description': 'Take 2 tablets of Metformin 500mg for diabetes.',
     },
     {
-      'time': '04:00 PM',
-      'title': 'Code Review',
-      'description': 'Review the latest pull requests.',
+      'time': '06:00 PM',
+      'title': 'Evening Medication',
+      'description': 'Take 1 capsule of Omeprazole 20mg for acid reflux.',
     },
   ];
 
@@ -43,7 +43,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Timeline'),
+        title: Text('Medical Timeline'),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -112,7 +112,7 @@ class TimelineEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: 16.0),
+      margin: EdgeInsets.only(bottom: 16.0), // Note: 'bottom' seems intended instead of 'custom'
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(

@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: LoginpageWidget(),
-      initialRoute: '/chat',
+      //  initialRoute: '/chat',
       routes: {
       '/timeline': (context) => TimelineScreen(
             pageController: PageController(initialPage: 0),

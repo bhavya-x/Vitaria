@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:vitaria/loginpage.dart';
 import 'dart:convert';
 import 'otpverify.dart';
 
@@ -40,7 +41,7 @@ class _SignUpPageWidgetState extends State<SignUpPageWidget> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('https://your-fastapi-endpoint.com/signup');
+    final url = Uri.parse('https://vitaria.onrender.com/auth/signup');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -61,14 +62,10 @@ class _SignUpPageWidgetState extends State<SignUpPageWidget> {
       // Sign-up successful, navigate to OTP verification page
       final responseData = json.decode(response.body);
       print('Sign-up successful: $responseData');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OTPVerificationPage(email: _emailController.text),
-        ),
-      );
+      Navigator.pushReplacementNamed(context, '/login');
     } else {
       // Sign-up failed
+      print(response.statusCode);
       final errorData = json.decode(response.body);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign-up failed: ${errorData['detail']}')),
@@ -104,7 +101,7 @@ class _SignUpPageWidgetState extends State<SignUpPageWidget> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.asset(
-                        'Assets/images/vitariafinalicon1.png',
+                        'Assets/images/vitarialogo.png',
                         width: double.infinity,
                         height: 150.0, // Adjusted height
                         fit: BoxFit.contain,
