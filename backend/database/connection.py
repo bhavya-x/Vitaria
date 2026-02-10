@@ -10,6 +10,6 @@ if not MONGO_URL:
 try:
     client = MongoClient(MONGO_URL)
     client.server_info()  # Test connection
-    db = client["smart_healthcare"]
+    db = client["Vitaria"]
 except Exception as e:
     raise ConnectionError(f"Failed to connect to MongoDB: {e}")
